@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ribbon Interface</title>
+    <style>
+        body {
+            background-color: black;
+            color: white;
+            font-family: Arial, sans-serif;
+            text-align: left; 
+        }
+        #header {
+            display: flex;
+            align-items: center;
+            justify-content: center; 
+            padding: 10px;
+        }
+        #header img {
+            margin-left: 30px;
+            width: 50px;
+            margin-right: 10px;
+            float: left;
+        }
+        #content {
+            padding: 20px;
+        }
+        ul {
+            list-style-type: none;
+            padding: 0;
+            margin: 0;
+            text-align: left;
+        }
+        li {
+            display: inline;
+            margin-right: 20px;
+        }
+        .button-container {
+            display: flex;
+            justify-content: center; 
+            margin-bottom: 20px;
+            margin-top: 50px;
+        }
+        button {
+            padding: 20px 250px; 
+            margin-right: 10px;
+            margin-top: 250px;
+            background-color: #333;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #555;
+        }
+        #tabs > div {
+            display: none;
+        }
+        #content ul li a {
+        color: violet;
+        }
+        /* Changing text color to white */
+        #content ul li a:hover {
+            color: white;
+        }
+        /* Changing background color to blue on hover */
+        #content ul li a:hover {
+            background-color: blue;
+        }
+        /* Changing background color of selected tab */
+        #content ul li a.active {
+            background-color: blue;
+            color: white;
+        }
+      
+    </style>
+</head>
+<body>
+    <div id="header">
+        <img src="{{ url_for('static', filename='B3.PNG') }}" alt="Logo">
+        <h1>B3 Automation</h1>
+    </div>
+    
+    <div id="content">
+        <ul>
+            <li><a href="#" onclick="showTab('data_qa')">Data QA</a></li>
+            <li><a href="#" onclick="showTab('tab')">Tab</a></li>
+            <li><a href="#" onclick="showTab('scrubbing')">Scrubbing</a></li>
+        </ul>
+        <div id="tabs">
+            <div id="data_qa" class="button-container">
+                <input type="number" id="x" name="x" placeholder="Enter x" style="display: none;">
+                <input type="number" id="y" name="y" placeholder="Enter y" style="display: none;">
+                <button onclick="performAction('QA 1')">QA 1</button>
+                <button onclick="performAction('QA 2')">QA 2</button>
+                <button onclick="performAction('QA 3')">QA 3</button>
+            </div>
+            <div id="tab" class="button-container">
+                <button onclick="performAction('Tab 1')">Tab 1</button>
+                <button onclick="performAction('Tab 2')">Tab 2</button>
+                <button onclick="performAction('Tab 3')">Tab 3</button>
+            </div>
+            <div id="scrubbing" class="button-container">
+                <button onclick="performAction('scrubbing 1')">scrubbing 1</button>
+                <button onclick="performAction('scrubbing 2')">scrubbing 2</button>
+                <button onclick="performAction('scrubbing 3')">scrubbing 3</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function showTab(tabId) {
+            // Hide all tabs
+            document.querySelectorAll('#tabs > div').forEach(tab => {
+                tab.style.display = 'none';
+            });
+            // Show the selected tab
+            document.getElementById(tabId).style.display = 'block';
+
+            // Show input fields if tab is "data_qa"
+            if (tabId === 'data_qa') {
+                document.getElementById('x').style.display = 'block';
+                document.getElementById('y').style.display = 'block';
+            } else {
+                // Hide input fields for other tabs
+                document.getElementById('x').style.display = 'none';
+                document.getElementById('y').style.display = 'none';
+            }
+        }
+
+        function performAction(action) {
+            // Get the values of x and y
+            var x = document.getElementById('x').value;
+            var y = document.getElementById('y').value;
+
+            // Send the action and values to the server
+            fetch('/perform_action', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ action: action, x: x, y: y })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.result) {
+                    alert('Result: ' + data.result);
+                } else {
+                    alert('Error: ' + data.error);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred. Please try again.');
+            });
+        }
+    </script>
+</body>
+</html>
